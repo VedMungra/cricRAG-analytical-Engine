@@ -64,29 +64,52 @@ def train_math_brain():
     df['batting_team'] = df['batting_team'].replace(team_mappings)
     df['bowling_team'] = df['bowling_team'].replace(team_mappings)
 
-    # Master Dictionary: Unify fractured venue names
+# Master Dictionary: Unify ALL fractured venue names (including newer/secondary stadiums)
     venue_mappings = {
+        # Bengaluru
         'M Chinnaswamy Stadium': 'M.Chinnaswamy Stadium, Bengaluru',
         'M Chinnaswamy Stadium, Bengaluru': 'M.Chinnaswamy Stadium, Bengaluru',
         'M.Chinnaswamy Stadium': 'M.Chinnaswamy Stadium, Bengaluru',
+        # Chennai
         'MA Chidambaram Stadium': 'MA Chidambaram Stadium, Chennai',
         'MA Chidambaram Stadium, Chepauk': 'MA Chidambaram Stadium, Chennai',
         'MA Chidambaram Stadium, Chepauk, Chennai': 'MA Chidambaram Stadium, Chennai',
+        # Hyderabad
         'Rajiv Gandhi International Stadium': 'Rajiv Gandhi International Stadium, Hyderabad',
         'Rajiv Gandhi International Stadium, Uppal': 'Rajiv Gandhi International Stadium, Hyderabad',
         'Rajiv Gandhi International Stadium, Uppal, Hyderabad': 'Rajiv Gandhi International Stadium, Hyderabad',
+        # Delhi
         'Feroz Shah Kotla': 'Arun Jaitley Stadium, Delhi',
         'Arun Jaitley Stadium': 'Arun Jaitley Stadium, Delhi',
+        # Mumbai
         'Wankhede Stadium': 'Wankhede Stadium, Mumbai',
         'Brabourne Stadium': 'Brabourne Stadium, Mumbai',
         'Dr DY Patil Sports Academy': 'Dr DY Patil Sports Academy, Mumbai',
+        # Mohali / Punjab
         'Punjab Cricket Association Stadium, Mohali': 'Punjab Cricket Association IS Bindra Stadium, Mohali',
         'Punjab Cricket Association IS Bindra Stadium': 'Punjab Cricket Association IS Bindra Stadium, Mohali',
         'Punjab Cricket Association IS Bindra Stadium, Mohali, Chandigarh': 'Punjab Cricket Association IS Bindra Stadium, Mohali',
         'Maharaja Yadavindra Singh International Cricket Stadium, Mullanpur': 'Maharaja Yadavindra Singh International Cricket Stadium, Mullanpur, Chandigarh',
         'Maharaja Yadavindra Singh International Cricket Stadium, Mullanpur, New Chandigarh': 'Maharaja Yadavindra Singh International Cricket Stadium, Mullanpur, Chandigarh',
-        'Sardar Patel Stadium, Motera': 'Narendra Modi Stadium, Ahmedabad'
+        # Ahmedabad
+        'Sardar Patel Stadium, Motera': 'Narendra Modi Stadium, Ahmedabad',
+        
+        # --- THE NEW & SECONDARY STADIUM FIXES ---
+        # Dharamsala
+        'Himachal Pradesh Cricket Association Stadium': 'Himachal Pradesh Cricket Association Stadium, Dharamsala',
+        # Visakhapatnam (Vizag)
+        'Dr. Y.S. Rajasekhara Reddy ACA-VDCA Cricket Stadium': 'Dr. Y.S. Rajasekhara Reddy ACA-VDCA Cricket Stadium, Visakhapatnam',
+        # Pune
+        'Maharashtra Cricket Association Stadium': 'Maharashtra Cricket Association Stadium, Pune',
+        'Subrata Roy Sahara Stadium': 'Maharashtra Cricket Association Stadium, Pune',
+        # Raipur
+        'Shaheed Veer Narayan Singh International Stadium': 'Shaheed Veer Narayan Singh International Stadium, Raipur',
+        # Jaipur
+        'Sawai Mansingh Stadium': 'Sawai Mansingh Stadium, Jaipur',
+        # Lucknow
+        'Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium': 'Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow'
     }
+    
     df['venue'] = df['venue'].replace(venue_mappings)
 
     # ==========================================
