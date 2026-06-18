@@ -1,0 +1,11 @@
+streamlit==1.35.0
+pandas
+scikit-learn
+xgboost
+joblib
+langchain
+langchain-chroma
+langchain-google-genai
+chromadb
+groq
+python-dotenv
