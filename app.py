@@ -1,39 +1,109 @@
+import os
 import streamlit as st
+from dotenv import load_dotenv
 
 # Import your Phase 3 Orchestrator
 from backend.orchestrator import classify_and_route
+from backend.api_integration import fetch_live_match_data, parse_live_match
+
+load_dotenv()
+API_KEY = os.getenv("CRIC_API_KEY", "")
 
 # --- Page Configuration ---
 st.set_page_config(page_title="cricRAG Predictor", page_icon="🏏", layout="wide")
 
+@st.experimental_dialog("⚠️ Important Disclaimer")
+def show_disclaimer():
+    st.markdown("""
+    **Please read before using cricRAG:**
+    - This analytical engine is for **educational and informational purposes only**.
+    - The ML predictions and AI chat are purely statistical and may contain inaccuracies.
+    - **Do not** use this tool for betting, gambling, or any financial decisions.
+    - **API Limits:** Live data automatically refreshes every 5 minutes. The free-tier API has a strict 100 hits/day limit, so please use the manual "Refresh Live Data" button sparingly to avoid hitting the cap!
+    """)
+    if st.button("I Understand & Agree"):
+        st.session_state.disclaimer_accepted = True
+        st.rerun()
+
+if "disclaimer_accepted" not in st.session_state:
+    show_disclaimer()
+
 # --- Sidebar Controls (Live Match Data) ---
-st.sidebar.header("⚙️ Live Match Parameters")
-st.sidebar.markdown("Slide to update the match state in real-time.")
+st.sidebar.header("⚙️ Match Configuration")
 
-venue = st.sidebar.selectbox("Venue", ["M Chinnaswamy Stadium", "Wankhede Stadium", "Eden Gardens"])
-current_score = st.sidebar.slider("Current Score", 0, 250, 120)
-wickets = st.sidebar.slider("Wickets Down", 0, 10, 3)
-overs = st.sidebar.slider("Overs Bowled", 0.0, 19.5, 14.0, step=0.1)
+live_match_state = {}
 
-# Package the slider data into the dictionary the Orchestrator expects
-live_match_state = {
-    "venue": venue,
-    "current_score": current_score,
-    "wickets": wickets,
-    "balls_bowled": overs
-}
+if st.sidebar.button("🔄 Refresh Live Data"):
+    fetch_live_match_data.clear()
+    st.rerun()
+
+if not API_KEY:
+    st.sidebar.warning("⚠️ CRIC_API_KEY not found in .env. Cannot fetch live data.")
+else:
+    with st.sidebar.status("Fetching IPL Matches...", expanded=True):
+        api_data = fetch_live_match_data(API_KEY)
+        matches = parse_live_match(api_data)
+        
+    if "error" in api_data and api_data["error"]:
+        st.sidebar.error(f"API Error: {api_data['error']}")
+    elif not matches:
+        st.sidebar.info("There are no upcoming IPL matches.")
+    else:
+        match_names = [m["name"] for m in matches]
+        selected_match_name = st.sidebar.selectbox("Select IPL Match", match_names)
+        selected_match = next((m for m in matches if m["name"] == selected_match_name), None)
+        
+        if selected_match:
+            st.sidebar.success(f"Status: {selected_match['status']}")
+            live_match_state = {
+                "venue": selected_match["venue"],
+                "current_score": selected_match["current_score"],
+                "wickets": selected_match["wickets"],
+                "balls_bowled": selected_match["balls_bowled"]
+            }
+
+if not live_match_state:
+    # Fallback empty state if no match is available
+    live_match_state = {
+        "venue": "N/A",
+        "current_score": 0,
+        "wickets": 0,
+        "balls_bowled": 0.0
+    }
 
 # --- Main Dashboard ---
 st.title("🏏 cricRAG Analytical Engine")
 st.markdown("### Dual-Architecture T20 Forecasting & Qualitative RAG")
 
+with st.expander("📖 How to Use this App"):
+    st.markdown("""
+    **1. Select the Live Match (Sidebar)**
+    - The app automatically fetches real-time data for active or upcoming IPL matches from the Live API.
+    - Select your desired match from the dropdown in the sidebar to load its real-time state.
+
+    **2. Review Current Metrics**
+    - The dashboard will instantly calculate the Current Run Rate and determine the current match phase.
+
+    **3. Ask the AI for Predictions**
+    - Scroll down to the **Ask the Orchestrator** chat box.
+    - Type a prompt like: *"Predict the final score for this match"* or *"What's the pitch report here?"*
+    - The AI will analyze the real-time match context, run it through the Machine Learning model, and return your prediction!
+    """)
+
 col1, col2, col3 = st.columns(3)
-crr = round(current_score / max(overs, 1), 2)
-col1.metric("Current Run Rate", f"{crr}")
-# In a real app, you might run predict_score_from_xgb here on every slider move.
-# For now, we will wait for the user to ask the chat.
-col2.metric("Projected Score", "Ask Chat for ML Output...") 
-col3.metric("Live Phase", "Death Overs" if overs >= 16 else ("Powerplay" if overs <= 6 else "Middle Overs"))
+current_score = live_match_state.get("current_score", 0)
+overs_bowled = live_match_state.get("balls_bowled", 0.0)
+crr = round(current_score / max(overs_bowled, 1), 2) if overs_bowled > 0 else 0.0
+
+with col1:
+    st.metric(label="📈 Current Run Rate", value=f"{crr:.2f}")
+
+with col2:
+    st.metric(label="🎯 Projected Score", value="-", help="Scroll down to the chat to get the XGBoost projected score!") 
+
+with col3:
+    phase = "Death Overs" if overs_bowled >= 16 else ("Powerplay" if overs_bowled <= 6 and overs_bowled > 0 else ("-" if overs_bowled == 0 else "Middle Overs"))
+    st.metric(label="🕒 Match Phase", value=phase)
 
 st.divider()
 

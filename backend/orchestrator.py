@@ -1,8 +1,15 @@
 import os
+import logging
+from typing import Optional, Dict, Any
 from dotenv import load_dotenv
 
+# Set up standard logging for a production-grade feel
+logging.basicConfig(level=logging.INFO, format='%(levelname)s - Orchestrator - %(message)s')
+logger = logging.getLogger(__name__)
+
 # Import your Text Brain (RAG Pipeline)
-from rag_pipeline import execute_fault_tolerant_rag
+# Assuming run from root directory based on Streamlit setup
+from backend.rag_pipeline import execute_fault_tolerant_rag
 
 # In the future, you will import your actual Phase 1 XGBoost model here.
 # For now, we will mock the ML execution call to test the fusion logic.
@@ -10,15 +17,30 @@ from rag_pipeline import execute_fault_tolerant_rag
 
 load_dotenv(override=True)
 
-def mock_predict_score_from_xgb(live_data: dict) -> str:
-    """A placeholder for your Phase 1 Math Brain."""
-    # Imagine your XGBoost model calculates this based on the live_data dict
-    return f"178.5 runs (Calculated via XGBRegressor based on {live_data['venue']})"
+def mock_predict_score_from_xgb(live_data: Dict[str, Any]) -> str:
+    """
+    A placeholder for the Phase 1 Math Brain (XGBoost Regressor).
+    
+    Args:
+        live_data (Dict[str, Any]): Dictionary containing current match state.
+        
+    Returns:
+        str: Mocked prediction string based on venue and match dynamics.
+    """
+    venue = live_data.get('venue', 'Unknown Venue')
+    return f"178.5 runs (Calculated via XGBRegressor based on {venue})"
 
-def classify_and_route(user_prompt: str, live_data: dict = None) -> str:
+def classify_and_route(user_prompt: str, live_data: Optional[Dict[str, Any]] = None) -> str:
     """
     The Central Nervous System. Classifies intent and routes traffic 
     between the Quantitative XGBoost model and the Qualitative RAG Engine.
+    
+    Args:
+        user_prompt (str): The raw text query from the user.
+        live_data (Optional[Dict[str, Any]]): Optional dictionary of live match parameters.
+        
+    Returns:
+        str: The fully synthesized AI response.
     """
     prompt_lower = user_prompt.lower()
     
@@ -29,11 +51,11 @@ def classify_and_route(user_prompt: str, live_data: dict = None) -> str:
     is_predictive = any(w in prompt_lower for w in predictive_keywords)
     is_qualitative = any(w in prompt_lower for w in qualitative_keywords)
     
-    print(f"\n⚡ Orchestrator Analysis -> Predictive Intent: {is_predictive} | Qualitative Intent: {is_qualitative}")
+    logger.info(f"Intent Analysis -> Predictive: {is_predictive} | Qualitative: {is_qualitative}")
 
     # ROUTE A: Hybrid Agentic Fusion (Needs Both)
     if is_predictive and is_qualitative:
-        print("🔗 Fusion Route Activated: Injecting Math into Text Brain...")
+        logger.info("Fusion Route Activated: Injecting Math into Text Brain...")
         
         # 1. Get exact numbers from Math Brain
         if live_data:
@@ -41,8 +63,7 @@ def classify_and_route(user_prompt: str, live_data: dict = None) -> str:
         else:
             ml_prediction = "[Unknown - requires live match dictionary]"
             
-        # 2. PROMPT INJECTION: We secretly rewrite the user's prompt before giving it to the LLM
-# 2. PROMPT INJECTION: Forcing the "Expert Analyst" persona
+        # 2. PROMPT INJECTION: Forcing the "Expert Analyst" persona
         agentic_prompt = (
             f"User Question: {user_prompt}\n\n"
             f"--- SYSTEM INSTRUCTION FOR LLM ---\n"
@@ -59,14 +80,14 @@ def classify_and_route(user_prompt: str, live_data: dict = None) -> str:
 
     # ROUTE B: Pure Quantitative (XGBoost Only)
     elif is_predictive:
-        print("🧮 Math Brain Route Activated: Directing query straight to XGBoost...")
+        logger.info("Math Brain Route Activated: Directing query straight to XGBoost...")
         if live_data:
             return f"[Math Brain Output]: Predicted Score is {mock_predict_score_from_xgb(live_data)}"
         return "[Math Brain Output]: Please provide live match parameters to generate an exact calculation."
 
     # ROUTE C: Pure Qualitative (ChromaDB + LLM RAG Only)
     else:
-        print("🧠 Text Brain Route Activated: Directing query straight to Vector Space...")
+        logger.info("Text Brain Route Activated: Directing query straight to Vector Space...")
         return execute_fault_tolerant_rag(user_prompt)
 
 

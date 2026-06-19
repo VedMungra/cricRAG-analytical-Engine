@@ -2,14 +2,19 @@ import os
 from dotenv import load_dotenv
 from langchain_chroma import Chroma
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from llm_agent import query_primary_model, query_fallback_model
+from backend.llm_agent import query_primary_model, query_fallback_model
 
 load_dotenv()
-os.environ["GOOGLE_API_KEY"] = os.getenv("GEMINI_API_KEY")
+os.environ["GOOGLE_API_KEY"] = os.getenv("GEMINI_API_KEY", "")
 
 print("🟢 Initializing Vector DB Index connection...")
 embedding_engine = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
-vector_db = Chroma(persist_directory="./chroma_db", embedding_function=embedding_engine)
+
+# Use absolute path based on project root (one level up from this script)
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CHROMA_PATH = os.path.join(ROOT_DIR, "chroma_db")
+
+vector_db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_engine)
 
 def execute_fault_tolerant_rag(user_query: str) -> str:
     # 1. Semantic Search

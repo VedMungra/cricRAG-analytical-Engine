@@ -9,3 +9,4 @@ langchain-google-genai
 chromadb
 groq
 python-dotenv
+requests
