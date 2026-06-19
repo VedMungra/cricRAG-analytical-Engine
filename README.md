@@ -1,11 +1,12 @@
 # 🏏 cricRAG Analytical Engine: Full-Stack AI & ML Pipeline
 
+![CricAPI](https://img.shields.io/badge/CricAPI-Live_Match_Data-20B2AA?style=flat)
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat&logo=python&logoColor=white)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.35.0-FF4B4B?style=flat&logo=streamlit&logoColor=white)
 ![XGBoost](https://img.shields.io/badge/Machine_Learning-XGBoost-orange?style=flat)
 ![LangChain](https://img.shields.io/badge/LangChain-Generative_AI-1C3C3C?style=flat)
 ![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector_Store-blue?style=flat)
 ![Google Gemini](https://img.shields.io/badge/Google_Gemini-Embeddings-4285F4?style=flat)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.35.0-FF4B4B?style=flat&logo=streamlit&logoColor=white)
 
 An enterprise-grade, dual-architecture AI system designed to forecast T20 cricket match outcomes and provide context-aware qualitative analysis via **Retrieval-Augmented Generation (RAG)**. cricRAG intelligently fuses a quantitative XGBoost machine learning model with a qualitative LLM brain, automatically fetching live IPL match data to provide highly accurate, contextual match predictions.
 
@@ -45,7 +46,7 @@ graph TD
     D -->|Quantitative Query| E[XGBoost Predictor]
     D -->|Qualitative Query| F[ChromaDB Vector Search]
     
-    E -->|Projected Score| G[Agentic Fusion Pipeline]
+    E -->|Projected Score| G[Agentic LLM Fusion Pipeline]
     F -->|Pitch/Contextual Facts| G
     
     G -->|Synthesize Final Response| A
@@ -108,5 +109,5 @@ Create a `.env` file in the root directory and add your required keys:
 | Variable | Required | Description |
 |---|---|---|
 | `CRIC_API_KEY` | ✅ | Free tier key at [cricapi.com](https://cricapi.com/) for live IPL polling |
-| `GOOGLE_API_KEY` | ✅ | Free Gemini API key at [aistudio.google.com](https://aistudio.google.com/) |
-| `GEMINI_API_KEY` | ❌ | Fallback alternate key for LLM generation |
+| `GEMINI_API_KEY` | ✅ | Primary LLM & Embeddings key from [Google AI Studio](https://aistudio.google.com/) |
+| `GROQ_API_KEY` | ❌ | Fallback LLM inference key |

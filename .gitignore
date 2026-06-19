@@ -1,11 +1,24 @@
 # Environments
 venv/
+env/
+.venv/
 .env
+.env.local
 
 # Vector Databases and Caches
 chroma_db/
 __pycache__/
+*.py[cod]
+.pytest_cache/
 .DS_Store
 
-# Phase 1 Model Binaries (Optional, but good practice if the .pkl is very large)
-# *.pkl
+# IDEs
+.vscode/
+.idea/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Model Binaries & Data (Large Files)
+*.pkl
+models/*.pkl
