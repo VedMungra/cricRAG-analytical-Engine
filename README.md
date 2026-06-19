@@ -6,6 +6,7 @@
 ![LangChain](https://img.shields.io/badge/LangChain-Generative_AI-1C3C3C?style=flat)
 ![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector_Store-blue?style=flat)
 ![Google Gemini](https://img.shields.io/badge/Google_Gemini-Embeddings-4285F4?style=flat)
+![Groq](https://img.shields.io/badge/Groq-Fallback_LLM-f55036?style=flat)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.35.0-FF4B4B?style=flat&logo=streamlit&logoColor=white)
 
 An enterprise-grade, dual-architecture AI system designed to forecast T20 cricket match outcomes and provide context-aware qualitative analysis via **Retrieval-Augmented Generation (RAG)**. cricRAG intelligently fuses a quantitative XGBoost machine learning model with a qualitative LLM brain, automatically fetching live IPL match data to provide highly accurate, contextual match predictions.
@@ -60,7 +61,8 @@ graph TD
 *   **XGBoost & scikit-learn**: Core predictive modeling.
 *   **LangChain**: Orchestrating agents, retrievers, and LLMs.
 *   **ChromaDB**: Local vector store for qualitative context.
-*   **Google Gemini APIs**: Powering both the text embeddings and the Generative AI responses.
+*   **Google Gemini APIs**: Powering both the text embeddings and the primary Generative AI responses.
+*   **Groq**: Extremely fast inference engine serving as the fallback LLM.
 *   **Pandas**: Heavy data sanitization and feature engineering.
 
 ### **Frontend & APIs**
@@ -75,6 +77,7 @@ graph TD
 *   Python 3.10+
 *   An API key from **CricAPI** (Free tier)
 *   An API key from **Google Studio (Gemini)**
+*   An API key from **Groq** (Free tier)
 
 ### **Local Deployment**
 ```bash
