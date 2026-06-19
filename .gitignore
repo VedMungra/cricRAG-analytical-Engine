@@ -6,6 +6,7 @@ env/
 .env.local
 
 # Vector Databases and Caches
+chroma_db/
 __pycache__/
 *.py[cod]
 .pytest_cache/
