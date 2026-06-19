@@ -12,7 +12,7 @@ API_KEY = os.getenv("CRIC_API_KEY", "")
 # --- Page Configuration ---
 st.set_page_config(page_title="cricRAG Predictor", page_icon="🏏", layout="wide")
 
-@st.experimental_dialog("⚠️ Important Disclaimer")
+@st.dialog("⚠️ Important Disclaimer")
 def show_disclaimer():
     st.markdown("""
     **Please read before using cricRAG:**
