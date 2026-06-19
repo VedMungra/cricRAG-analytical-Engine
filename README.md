@@ -93,3 +93,54 @@ This project is being developed in iterative, agile sprints. With the quantitati
 ```bash
 git clone [https://github.com/yourusername/cricRAG-analytical-Engine.git](https://github.com/yourusername/cricRAG-analytical-Engine.git)
 cd cricRAG-analytical-Engine
+
+graph TD
+    %% Define Styles
+    classDef frontend fill:#ff4b4b,stroke:#fff,stroke-width:2px,color:#fff
+    classDef router fill:#feca57,stroke:#333,stroke-width:2px,color:#333
+    classDef mathBrain fill:#48dbfb,stroke:#333,stroke-width:2px,color:#333
+    classDef textBrain fill:#1dd1a1,stroke:#333,stroke-width:2px,color:#333
+    classDef database fill:#ff9f43,stroke:#333,stroke-width:2px,color:#333
+
+    %% Nodes
+    USER((👤 User))
+    UI[🖥️ Streamlit Frontend]:::frontend
+    
+    ORCH{🧠 Orchestrator \nIntent Classification}:::router
+    
+    MATH[🧮 Phase 1: XGBoost \nQuantitative Engine]:::mathBrain
+    
+    TEXT_PIPELINE[📚 Phase 2: RAG Pipeline]:::textBrain
+    VDB[(🗄️ ChromaDB \nVector Space)]:::database
+    LLM_ROUTER{⚙️ Fault-Tolerant \nLLM Router}:::router
+    GEMINI[🔹 Google Gemini \nPrimary]:::textBrain
+    GROQ[🔸 Groq Llama 3.1 \nFallback]:::textBrain
+    
+    FINAL[💬 Synthesized \nBroadcaster Output]:::frontend
+
+    %% Connections
+    USER -->|Adjusts Live Sliders| UI
+    USER -->|Types Text Prompt| UI
+    
+    UI -->|Match State + Query| ORCH
+    
+    %% Routing Paths
+    ORCH -->|Route B: Pure Math| MATH
+    ORCH -->|Route C: Pure Text| TEXT_PIPELINE
+    
+    %% The Hybrid Magic
+    ORCH -->|Route A: Hybrid Fusion| MATH
+    MATH -->|Calculated Score Injected \ninto System Prompt| TEXT_PIPELINE
+    
+    %% RAG Internal Flow
+    TEXT_PIPELINE -->|Retrieves Ground Truth| VDB
+    VDB -->|Historical Context| LLM_ROUTER
+    
+    LLM_ROUTER -->|Attempt 1| GEMINI
+    LLM_ROUTER -->|If API Fails / Rate Limit| GROQ
+    
+    %% Output
+    GEMINI --> FINAL
+    GROQ --> FINAL
+    MATH -.->|If Route B| FINAL
+    FINAL --> UI
